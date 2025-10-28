@@ -24,8 +24,10 @@ const StyledLink = (props: StyledLinkProps) => {
 };
 
 const Header = () => {
+  // 스크롤 상태 관리 - 스크롤 시 하단 테두리 표시
   const [isScrolled, setIsScrolled] = useState(false);
 
+  // 스크롤 이벤트 리스너 등록/해제
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
@@ -55,7 +57,7 @@ const Header = () => {
             justifyContent: "space-between",
           }}
         >
-          {/* 로고 */}
+          {/* 왼쪽: 로고 영역 */}
           <StyledLink to="/">
             <Typography
               sx={(theme) => ({
@@ -64,17 +66,15 @@ const Header = () => {
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
                 fontWeight: 700,
-                fontSize: { md: "23px" },
+                fontSize: { xs: "20px", md: "27px" },
               })}
             >
               Welfaring
             </Typography>
           </StyledLink>
 
-          {/* 우측 버튼 */}
+          {/* 오른쪽: 로그인/회원가입 버튼 영역 */}
           <Stack direction="row" alignItems="center" gap={{ xs: 0.5, md: 1 }}>
-            {/* 로그인 텍스트 링크 */}
-
             {/* 로그인 버튼 */}
             <Button
               variant="contained"
