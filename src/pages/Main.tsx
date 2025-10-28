@@ -4,8 +4,9 @@ import { NavLink } from "react-router-dom";
 const Main = () => {
   return (
     <>
-      {/* 히어로 섹션 - PC는 2컬럼, 모바일은 세로 */}
+      {/* 메인 컨테이너 */}
       <Container maxWidth="xl">
+        {/* 메인 콘텐츠 스택 */}
         <Stack gap={"5vh"}>
           <Box
             mt={{ xs: 5, md: 0 }}
@@ -15,7 +16,7 @@ const Main = () => {
               flexDirection: { xs: "column", md: "row" },
             }}
           >
-            {/* 좌측: 텍스트 영역 */}
+            {/* 왼쪽: 텍스트 및 버튼 영역 */}
             <Box
               sx={{
                 width: { xs: "100%", md: "50%" },
@@ -25,7 +26,9 @@ const Main = () => {
                 bgcolor: "white",
               }}
             >
+              {/* 텍스트 콘텐츠 스택 */}
               <Stack gap={3}>
+                {/* 메인 타이틀 */}
                 <Typography
                   variant="h2"
                   sx={{
@@ -40,7 +43,7 @@ const Main = () => {
                   웰페어링으로 한눈에
                 </Typography>
 
-                {/* 통합 서브타이틀 */}
+                {/* 서브타이틀 */}
                 <Typography
                   variant="h5"
                   sx={{
@@ -54,11 +57,11 @@ const Main = () => {
                   내게 맞는 웰페어링 AI가 숨은 혜택을 찾아드립니다!
                 </Typography>
 
-                {/* 통합 버튼 */}
+                {/* 시작 버튼 */}
                 <Button
                   variant="contained"
                   component={NavLink}
-                  to="/register"
+                  to="/question"
                   sx={(theme) => ({
                     backgroundColor: theme.palette.primary.main,
                     color: "white",
@@ -78,7 +81,7 @@ const Main = () => {
               </Stack>
             </Box>
 
-            {/* 우측: 아이콘 네트워크 영역 - PC에서만 표시 */}
+            {/* 오른쪽: 아이콘 영역 (PC에서만 표시) */}
             <Box
               display={{ xs: "none", md: "flex" }}
               width="50%"
@@ -97,7 +100,7 @@ const Main = () => {
                   position: "relative",
                 }}
               >
-                {/* 중앙 브레인 아이콘 */}
+                {/* 중앙 아이콘 */}
                 <Box
                   sx={{
                     width: "120px",
@@ -137,7 +140,7 @@ const Main = () => {
             </Box>
           </Box>
 
-          {/* 회색 블록 섹션 */}
+          {/* 추가 콘텐츠 섹션 */}
           <Box>
             <Stack gap={4}>
               <Box
