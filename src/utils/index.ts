@@ -13,7 +13,8 @@ export const theme = createTheme({
             main: "#4E6BA9",
             light: "#6FB1DC",
             dark: "#5B88BE",
-            hover: "#3d5594"
+            hover: "#3d5594",
+            hover2: "#d9d9d9",
           },
           secondary: { 
             main: "#6e6e6e", 

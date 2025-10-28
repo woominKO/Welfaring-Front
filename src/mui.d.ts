@@ -17,10 +17,12 @@ declare module '@mui/material/styles' {
 
   interface PaletteColor {
     hover?: string;
+    hover2?: string;
   }
 
   interface SimplePaletteColorOptions {
     hover?: string;
+    hover2?: string;
   }
 
   interface TypeBackground {
