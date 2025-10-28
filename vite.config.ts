@@ -8,4 +8,7 @@ export default defineConfig({
       jsxImportSource: "@emotion/react",
     }),
   ],
+  server: {
+    port: 4001,
+  },
 });

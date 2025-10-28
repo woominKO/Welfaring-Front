@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createTheme } from "@mui/material";
-import { useSetAtom } from "jotai";
 
 /**
  * MUI 테마 객체
@@ -8,18 +8,61 @@ export const theme = createTheme({
     colorSchemes: {
       light: {
         palette: {
-          primary: { main: "#a72b43", light: "#a72b43" },
-          secondary: { main: "#6e6e6e", light: "#f4f4f4", dark: "#4d4d4d" },
-          text: { primary: "#000" },
+          mode: 'light',
+          primary: { 
+            main: "#4E6BA9",
+            light: "#6FB1DC",
+            dark: "#5B88BE",
+            hover: "#3d5594"
+          },
+          secondary: { 
+            main: "#6e6e6e", 
+            light: "#f4f4f4", 
+            dark: "#4d4d4d" 
+          },
+          background: {
+            default: "#ffffff",
+            paper: "#ffffff",
+            gray: "#f5f5f5",
+            lightGray: "#e0e0e0"
+          },
+          border: {
+            default: "#d9d9d9",
+            light: "#e0e0e0"
+          } as any,
+          text: { 
+            primary: "#000000" 
+          },
         },
       },
       dark: {
         palette: {
-          primary: { main: "#cb3452" },
-          secondary: { main: "#ccc" },
-          background: { default: "#323232", paper: "#323232" },
+          mode: 'dark',
+          primary: { 
+            main: "#6FB1DC",
+            light: "#8BC4E8",
+            dark: "#5B88BE",
+            hover: "#4E6BA9"
+          },
+          secondary: { 
+            main: "#ccc",
+            light: "#f4f4f4",
+            dark: "#6e6e6e"
+          },
+          background: {
+            default: "#1a1a1a",
+            paper: "#323232",
+            gray: "#2d2d2d",
+            lightGray: "#3d3d3d"
+          } as any,
+          border: {
+            default: "rgba(255, 255, 255, 0.2)",
+            light: "rgba(255, 255, 255, 0.1)"
+          } as any,
           divider: "rgba(255, 255, 255, 0.5)",
-          text: { primary: "#fff" },
+          text: { 
+            primary: "#ffffff" 
+          },
         },
       },
     },
