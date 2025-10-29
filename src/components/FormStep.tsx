@@ -25,6 +25,7 @@ interface FormStepProps {
   onFormDataChange?: (data: Record<string, string>) => void;
   stepKey?: number; // step 변경 감지용
   icon?: SvgIconComponent; // 아이콘 컴포넌트
+  initialValues?: Record<string, string>; // 초기값
 }
 
 const FormStep = ({
@@ -35,14 +36,20 @@ const FormStep = ({
   onFormDataChange,
   stepKey,
   icon: IconComponent = CalendarToday,
+  initialValues = {},
 }: FormStepProps) => {
   // 폼 데이터 상태 관리
   const [formData, setFormData] = useState<Record<string, string>>({});
 
-  // 단계 변경 시 폼 데이터 초기화
+  // 단계 변경 시 폼 데이터 초기화 또는 복원
   useEffect(() => {
-    setFormData({});
-  }, [stepKey]);
+    if (initialValues && Object.keys(initialValues).length > 0) {
+      setFormData(initialValues);
+    } else {
+      setFormData({});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepKey, initialValues]);
 
   // 입력값 변경 처리 및 부모 컴포넌트에 데이터 전달
   const handleInputChange = (field: string, value: string) => {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import FormStep from "../components/FormStep";
 import {
   Box,
@@ -10,6 +10,7 @@ import {
   Alert,
   Collapse,
   Dialog,
+  DialogTitle,
   DialogContent,
   DialogActions,
 } from "@mui/material";
@@ -23,11 +24,47 @@ const Question = () => {
   const [currentFormData, setCurrentFormData] = useState<
     Record<string, string>
   >({});
+  // 모든 단계의 폼 데이터 저장
+  const [allFormData, setAllFormData] = useState<
+    Record<string, Record<string, string>>
+  >({});
   // 알림 표시 상태 관리
   const [showAlert, setShowAlert] = useState(false);
   // 확인 다이얼로그 표시 상태 관리
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const navigate = useNavigate();
+  const alertTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Alert 자동 숨김 처리
+  useEffect(() => {
+    if (showAlert) {
+      // 기존 타이머가 있다면 정리
+      if (alertTimeoutRef.current) {
+        clearTimeout(alertTimeoutRef.current);
+      }
+      // 3초 후 Alert 숨김
+      alertTimeoutRef.current = setTimeout(() => {
+        setShowAlert(false);
+      }, 3000);
+    }
+
+    // cleanup: 컴포넌트 unmount 또는 showAlert 변경 시 타이머 정리
+    return () => {
+      if (alertTimeoutRef.current) {
+        clearTimeout(alertTimeoutRef.current);
+      }
+    };
+  }, [showAlert]);
+
+  // step 변경 시 해당 단계의 저장된 데이터 복원
+  useEffect(() => {
+    const savedData = allFormData[step];
+    if (savedData) {
+      setCurrentFormData(savedData);
+    } else {
+      setCurrentFormData({});
+    }
+  }, [step, allFormData]);
 
   // 폼 단계 정의
   const steps = [
@@ -80,6 +117,16 @@ const Question = () => {
     },
   ];
 
+  // 폼 데이터 변경 처리
+  const handleFormDataChange = (data: Record<string, string>) => {
+    setCurrentFormData(data);
+    // 현재 단계의 데이터를 저장
+    setAllFormData((prev) => ({
+      ...prev,
+      [step]: data,
+    }));
+  };
+
   // 다음 단계로 이동 처리
   const handleNext = () => {
     const currentStep = steps[step];
@@ -91,10 +138,15 @@ const Question = () => {
       );
       if (!allFieldsFilled) {
         setShowAlert(true);
-        setTimeout(() => setShowAlert(false), 3000);
         return;
       }
     }
+
+    // 현재 단계의 데이터 저장
+    setAllFormData((prev) => ({
+      ...prev,
+      [step]: currentFormData,
+    }));
 
     setShowAlert(false);
     if (step < steps.length - 1) {
@@ -125,7 +177,14 @@ const Question = () => {
   // 제출 확인 처리
   const handleConfirmSubmit = () => {
     setShowConfirmDialog(false);
-    navigate("/");
+    // 모든 단계의 데이터를 합쳐서 전달
+    const mergedData: Record<string, string> = {};
+    Object.values(allFormData).forEach((stepData) => {
+      Object.assign(mergedData, stepData);
+    });
+    // 현재 단계의 데이터도 포함
+    Object.assign(mergedData, currentFormData);
+    navigate("/result", { state: { formData: mergedData } });
   };
 
   // 제출 취소 처리
@@ -136,7 +195,7 @@ const Question = () => {
   const currentStep = steps[step];
 
   return (
-    <Container maxWidth="md" sx={{ pb: 10 }}>
+    <Container maxWidth="md" sx={{ pb: 10, pt:4}}>
       <Stack gap={3}>
         {/* 상단 네비게이션 바 */}
         <Stack
@@ -158,9 +217,10 @@ const Question = () => {
           title={currentStep.title}
           subtitle={currentStep.subtitle}
           formFields={currentStep.formFields}
-          onFormDataChange={setCurrentFormData}
+          onFormDataChange={handleFormDataChange}
           stepKey={step}
           icon={currentStep.icon}
+          initialValues={allFormData[step] || {}}
         />
 
         {/* 알림 메시지 영역 */}
@@ -241,14 +301,19 @@ const Question = () => {
         onClose={handleCancelSubmit}
         maxWidth="sm"
         fullWidth
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-description"
         sx={{
           "& .MuiDialog-paper": {
             borderRadius: 2,
           },
         }}
       >
+        <DialogTitle id="confirm-dialog-title" sx={{ textAlign: "center", py: 2 }}>
+          제출 확인
+        </DialogTitle>
         <Stack py={2}>
-        <DialogContent sx={{ textAlign: "center", py: 2 }}>
+        <DialogContent id="confirm-dialog-description" sx={{ textAlign: "center", py: 2 }}>
           <Typography variant="body1" color="text.secondary">
             입력하신 정보를 제출하시겠습니까?
           </Typography>
@@ -267,6 +332,7 @@ const Question = () => {
           <Button
             variant="contained"
             onClick={handleConfirmSubmit}
+            autoFocus
             sx={{
               minWidth: 100,
               borderRadius: 2,

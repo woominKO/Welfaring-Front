@@ -32,7 +32,8 @@ export const theme = createTheme({
             light: "#e0e0e0"
           } as any,
           text: { 
-            primary: "#000000" 
+            primary: "#000000",
+            secondary: "#404040"
           },
         },
       },
@@ -62,7 +63,8 @@ export const theme = createTheme({
           } as any,
           divider: "rgba(255, 255, 255, 0.5)",
           text: { 
-            primary: "#ffffff" 
+            primary: "#ffffff",
+            secondary: "#404040"
           },
         },
       },

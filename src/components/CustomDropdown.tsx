@@ -111,6 +111,8 @@ const CustomDropdown = ({
 
   // 외부 클릭 시 드롭다운 닫기 이벤트 리스너
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
       if (!target.closest(`.${className}`)) {
@@ -118,15 +120,15 @@ const CustomDropdown = ({
       }
     };
 
-    if (isOpen) {
-      setTimeout(() => {
-        document.addEventListener("mousedown", handleClickOutside);
-      }, 0);
+    // 다음 이벤트 루프에서 리스너 추가 (현재 이벤트가 처리된 후)
+    const timeoutId = setTimeout(() => {
+      document.addEventListener("mousedown", handleClickOutside, true);
+    }, 0);
 
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener("mousedown", handleClickOutside, true);
+    };
   }, [isOpen, className]);
 
   const filteredOptions = getFilteredOptions(value);
