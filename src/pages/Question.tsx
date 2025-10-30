@@ -111,19 +111,6 @@ const Question = () => {
     {
       type: "선택" as const,
       title: "추가정보",
-      subtitle: "자세한 정보를 입력해주세요.",
-      icon: Work,
-      formFields: [
-        {
-          title: "세부사항(자세히)",
-          type: "input" as const,
-          placeholder: "입력해주세요.",
-        },
-      ],
-    },
-    {
-      type: "선택" as const,
-      title: "추가정보",
       subtitle: "추가 정보를 입력해주세요.",
       icon: Work,
       formFields: [
@@ -346,9 +333,6 @@ const Question = () => {
           },
         }}
       >
-        <DialogTitle id="confirm-dialog-title" sx={{ textAlign: "center", py: 2 }}>
-          제출 확인
-        </DialogTitle>
         <Stack py={2}>
           <DialogContent id="confirm-dialog-description" sx={{ textAlign: "center", py: 2 }}>
             <Typography variant="body1" color="text.secondary">

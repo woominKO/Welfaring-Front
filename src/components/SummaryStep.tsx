@@ -210,7 +210,7 @@ const SummaryStep = ({
                         <Stack direction="row" alignItems="center" justifyContent="space-between">
                             <Stack direction="row" alignItems="center" gap={1}>
                                 <AutoAwesome sx={{ color: "primary.main" }} />
-                                <Typography variant="h6" fontWeight={700}>
+                                <Typography variant="h6" fontWeight={700} fontSize={20}>
                                     {selectedCard.title}
                                 </Typography>
                             </Stack>
@@ -239,7 +239,7 @@ const SummaryStep = ({
 
                                 {/* 신청 자격 */}
                                 <Box>
-                                    <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5 }}>
+                                    <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5, fontSize: 15 }}>
                                         신청 자격
                                     </Typography>
                                     <Stack gap={1}>
@@ -265,7 +265,7 @@ const SummaryStep = ({
 
                                 {/* 신청 방법 */}
                                 <Box>
-                                    <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5 }}>
+                                    <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5, fontSize: 15 }}>
                                         신청 방법
                                     </Typography>
                                     <Stack gap={1}>
@@ -291,7 +291,7 @@ const SummaryStep = ({
 
                                 {/* 필요 서류 */}
                                 <Box>
-                                    <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5 }}>
+                                    <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5, fontSize: 15 }}>
                                         필요 서류
                                     </Typography>
                                     <Stack gap={1}>
@@ -317,7 +317,7 @@ const SummaryStep = ({
 
                                 {/* 지원 금액 */}
                                 <Box>
-                                    <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5 }}>
+                                    <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5, fontSize: 15 }}>
                                         지원 금액
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
@@ -327,7 +327,7 @@ const SummaryStep = ({
 
                                 {/* 문의처 */}
                                 <Box>
-                                    <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5 }}>
+                                    <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5, fontSize: 15 }}>
                                         문의처
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
