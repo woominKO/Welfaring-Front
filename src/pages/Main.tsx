@@ -1,5 +1,11 @@
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { NavLink } from "react-router-dom";
+import heroImg from "../assets/a.png";
+import tgImg from "../assets/Tg.png";
+import pImg from "../assets/p.png";
+import kImg from "../assets/k.png";
+import jImg from "../assets/j.png";
+import gImg from "../assets/g.png";
 
 const Main = () => {
   return (
@@ -7,7 +13,7 @@ const Main = () => {
       {/* 메인 컨테이너 */}
       <Container maxWidth="xl">
         {/* 메인 콘텐츠 스택 */}
-        <Stack gap={"5vh"}>
+        <Stack sx={{ gap: { xs: "5vh", md: "15vh" }, mb: { xs: "5vh", md: "10vh" } }}>
           <Box
             mt={{ xs: 4, md: 0 }}
             minHeight={{ xs: "0", md: "calc(100vh - 500px)" }}
@@ -92,7 +98,6 @@ const Main = () => {
                 sx={{
                   width: "80%",
                   height: "80%",
-                  bgcolor: "white",
                   borderRadius: "8px",
                   display: { xs: "none", md: "flex" },
                   alignItems: "center",
@@ -100,40 +105,15 @@ const Main = () => {
                   position: "relative",
                 }}
               >
-                {/* 중앙 아이콘 */}
+                {/* 중앙 이미지 */}
                 <Box
+                  component="img"
+                  src={heroImg}
+                  alt="웰페어링 인트로"
                   sx={{
-                    width: "120px",
-                    height: "120px",
-                    bgcolor: "#4ECDC4",
-                    borderRadius: "50%",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    position: "relative",
-                    "&::before": {
-                      content: '""',
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      width: "80px",
-                      height: "80px",
-                      bgcolor: "#26a69a",
-                      borderRadius: "50%",
-                      zIndex: 1,
-                    },
-                    "&::after": {
-                      content: '""',
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      width: "40px",
-                      height: "40px",
-                      bgcolor: "#00695c",
-                      borderRadius: "50%",
-                      zIndex: 2,
-                    },
+                    maxWidth: "70%",
+                    height: "auto",
+                    display: "block",
                   }}
                 />
               </Box>
@@ -144,12 +124,39 @@ const Main = () => {
           <Box>
             <Stack gap={4}>
               <Box
-                sx={(theme) => ({
-                  height: { xs: "400px", md: "500px" },
-                  bgcolor: theme.palette.background.lightGray,
+                sx={{
+                  height: { xs: "auto", md: "auto" },
                   borderRadius: "8px",
-                })}
-              />
+                }}
+              >
+                <Typography
+                  variant="h1"
+                  sx={{
+                    textAlign: "center",
+                    fontWeight: 700,
+                    mb: 2,
+                  }}
+                >
+                  팀원 소개
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: { xs: "wrap", md: "nowrap" },
+                    width: { xs: "100%", md: "100%" },
+                    gap: { xs: 1.5, md: 0 },
+                    justifyContent: { xs: "center", md: "space-between" },
+                    alignItems: "center",
+                    overflowX: "hidden",
+                  }}
+                >
+                  <Box component="img" src={tgImg} alt="팀 카드 1" sx={{ flex: { xs: "0 0 30%", md: "0 0 17%" }, maxWidth: { xs: "30%", md: "17%" }, height: "auto" }} />
+                  <Box component="img" src={pImg} alt="팀 카드 2" sx={{ flex: { xs: "0 0 30%", md: "0 0 17%" }, maxWidth: { xs: "30%", md: "17%" }, height: "auto" }} />
+                  <Box component="img" src={kImg} alt="팀 카드 3" sx={{ flex: { xs: "0 0 30%", md: "0 0 17%" }, maxWidth: { xs: "30%", md: "17%" }, height: "auto" }} />
+                  <Box component="img" src={jImg} alt="팀 카드 4" sx={{ flex: { xs: "0 0 30%", md: "0 0 17%" }, maxWidth: { xs: "30%", md: "17%" }, height: "auto" }} />
+                  <Box component="img" src={gImg} alt="팀 카드 5" sx={{ flex: { xs: "0 0 30%", md: "0 0 17%" }, maxWidth: { xs: "30%", md: "17%" }, height: "auto" }} />
+                </Box>
+              </Box>
             </Stack>
           </Box>
         </Stack>
