@@ -4,16 +4,16 @@ import { InputData } from "./InputInfoSection"; // InputData 인터페이스 재
 import { BenefitCard } from "./SummaryStep"; // 응답 타입
 
 /**
- * 백엔드 UserProfileDTO 스키마에 맞춘 타입 (추정)
+ㅞ * 백엔드 요청 DTO 타입
  */
 interface UserProfileDTO {
   age?: number;
   gender?: string;
   region?: string;
-  insuranceType?: string;
-  diseases?: string[];
-  disability?: string; // ⬅️ 누락되었던 필드
-  description?: string; // ⬅️ 누락되었던 필드
+  healthConditions?: string[];
+  disability?: boolean;
+  insurance_type?: string;
+  description?: string;
 }
 
 /**
@@ -35,7 +35,7 @@ export const sendDataToAiMatcher = async (inputData: InputData, signal?: AbortSi
 
   // --- 2. 백엔드 DTO 스키마에 맞게 데이터 매핑 ---
   const ageNumber = Number.parseInt(inputData.나이, 10);
-  const diseases = inputData.질환
+  const healthConditions = inputData.질환
     ? inputData.질환
         .split(/[，,\n\r\t ]+/) // 다양한 구분자(콤마, 공백, 줄바꿈 등)로 분리
         .map((s) => s.trim())
@@ -46,11 +46,10 @@ export const sendDataToAiMatcher = async (inputData: InputData, signal?: AbortSi
     age: Number.isFinite(ageNumber) ? ageNumber : undefined,
     gender: inputData.성별 || undefined,
     region: inputData.지역 || undefined,
-    insuranceType: inputData.보험 || undefined,
-    diseases: diseases,
-    disability: inputData.장애 || undefined, // ⬅️ [수정] '장애' 필드 추가
-    description: inputData.추가설명 || undefined, // ⬅️ [수정] '추가설명' 필드 추가
-    // (참고: 백엔드 DTO의 실제 필드명이 'disability', 'description'이 아닐 경우 수정 필요)
+    healthConditions: healthConditions,
+    disability: inputData.장애 === "있음" ? true : false,
+    insurance_type: inputData.보험 || undefined,
+    description: inputData.추가설명 || undefined,
   };
 
   // --- 3. API 호출 ---
@@ -93,7 +92,7 @@ export const fetchMatchingBenefits = async (
   const endpoint = `${normalizedBase}/api/match/ai`;
 
   const ageNumber = Number.parseInt(inputData.나이, 10);
-  const diseases = inputData.질환
+  const healthConditions = inputData.질환
     ? inputData.질환
         .split(/[，,\n\r\t ]+/)
         .map((s) => s.trim())
@@ -104,9 +103,9 @@ export const fetchMatchingBenefits = async (
     age: Number.isFinite(ageNumber) ? ageNumber : undefined,
     gender: inputData.성별 || undefined,
     region: inputData.지역 || undefined,
-    insuranceType: inputData.보험 || undefined,
-    diseases,
-    disability: inputData.장애 || undefined,
+    healthConditions: healthConditions,
+    disability: inputData.장애 === "있음" ? true : false,
+    insurance_type: inputData.보험 || undefined,
     description: inputData.추가설명 || undefined,
   };
 
@@ -155,13 +154,21 @@ export const fetchMatchingBenefits = async (
       (benefit: any, index: number) => {
         const conditions: string[] = [];
 
-        // title/description/provider/application_method: snake_case | camelCase 모두 허용
-        const dataSource = benefit.data_source || benefit.dataSource || {};
-        const sourceName = dataSource.source_name || dataSource.sourceName;
-        const benefitName = sourceName || benefit.benefit_name || benefit.benefitName || benefit.title;
-        const benefitDesc = benefit.benefit_description || benefit.benefitDescription || benefit.description;
-        const applicationMethod = benefit.application_method || benefit.applicationMethod;
+        // benefit_name을 우선 사용 (카드 제목)
+        const benefitName = benefit.benefit_name || benefit.benefitName || benefit.title || '제목 없음';
+        
+        // 추가 필드 파싱
+        const benefitDesc = benefit.benefit_description || benefit.benefitDescription || benefit.description || '';
+        const applicationMethod = benefit.application_method || benefit.applicationMethod || '';
         const provider = benefit.provider || benefit.agency || '';
+        const supportAmount = benefit.support_amount || benefit.supportAmount || '';
+        const contactInfo = benefit.contact_info || benefit.contactInfo || provider || '';
+        
+        // 필요 서류 파싱
+        const requiredDocs = benefit.required_documents || benefit.requiredDocuments || [];
+        const requiredDocuments = Array.isArray(requiredDocs) 
+          ? requiredDocs.map((doc: any) => typeof doc === 'string' ? doc : doc?.name || doc?.document || '')
+          : [];
 
         // target_criteria → conditions 변환 (snake_case | camelCase 모두 허용)
         const criteriaRoot = benefit.target_criteria || benefit.targetCriteria || {};
@@ -218,15 +225,15 @@ export const fetchMatchingBenefits = async (
 
         const card: BenefitCard = {
           id: `benefit-${index}`,
-          title: benefitName || '제목 없음',
+          title: benefitName,
           conditions: conditions.length > 0 ? conditions : ["조건 정보 없음"],
           detail: {
-            description: benefitDesc || '',
+            description: benefitDesc,
             eligibility: conditions,
             applicationMethod: applicationMethod ? [applicationMethod] : [],
-            requiredDocuments: [],
-            supportAmount: "",
-            contactInfo: provider,
+            requiredDocuments: requiredDocuments,
+            supportAmount: supportAmount,
+            contactInfo: contactInfo,
           },
         };
 

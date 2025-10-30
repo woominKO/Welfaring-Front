@@ -36,7 +36,7 @@ const Result = () => {
       장애: formData["장애"] || "",
       질환: formData["질환"] || "",
       보험: formData["보험"] || "",
-      추가설명: formData["세부사항(자세히)"] || "",
+      추가설명: formData["추가설명"] || "", // 폼에서 추가설명 필드 사용
     }),
     [formData]
   );
