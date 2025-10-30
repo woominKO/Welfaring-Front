@@ -8,6 +8,9 @@ import {
   Typography,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
+import { IconButton, Tooltip } from "@mui/material";
+import { useColorScheme } from "@mui/material/styles";
+import { DarkMode, LightMode } from "@mui/icons-material";
 
 interface StyledLinkProps {
   to: string;
@@ -26,6 +29,8 @@ const StyledLink = (props: StyledLinkProps) => {
 const Header = () => {
   // 스크롤 상태 관리 - 스크롤 시 하단 테두리 표시
   const [isScrolled, setIsScrolled] = useState(false);
+  // MUI CssVarsProvider 기반 컬러스킴 연동
+  const { mode, setMode } = useColorScheme();
 
   // 스크롤 이벤트 리스너 등록/해제
   useEffect(() => {
@@ -37,6 +42,11 @@ const Header = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const toggleMode = () => {
+    if (!setMode) return;
+    setMode(mode === 'light' ? 'dark' : 'light');
+  };
 
   return (
     <AppBar
@@ -74,13 +84,26 @@ const Header = () => {
           </StyledLink>
 
           {/* 오른쪽: 로그인/회원가입 버튼 영역 */}
-          <Stack direction="row" alignItems="center" gap={{ xs: 0.5, md: 1 }}>
+          <Stack direction="row" alignItems="center" gap={{ xs: 0.5, md: 1 }} >
+            {/* 화이트/다크 모드 버튼 */}
+            <Tooltip title={(mode || 'light') === 'dark' ? '라이트 모드' : '다크 모드'}>
+              <IconButton
+                aria-label="toggle color mode"
+                onClick={toggleMode}
+                sx={{
+                  borderRadius: '8px',
+                }}
+              >
+                {(mode || 'light') === 'dark' ? <LightMode /> : <DarkMode />}
+              </IconButton>
+            </Tooltip>
             {/* 로그인 버튼 */}
             <Button
               variant="contained"
               component={NavLink}
               to="/login"
               sx={(theme) => ({
+                display: 'none',
                 backgroundColor: theme.palette.background.default,
                 color: theme.palette.primary.main,
                 px: { xs: 2, md: 3 },
@@ -107,6 +130,7 @@ const Header = () => {
               component={NavLink}
               to="/register"
               sx={(theme) => ({
+                display: 'none',
                 backgroundColor: theme.palette.primary.main,
                 color: "white",
                 px: { xs: 2, md: 3 },

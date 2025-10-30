@@ -59,46 +59,46 @@ const FormStep = ({
   };
 
   return (
-      <Stack gap={3} py={4}>
-        {/* 아이콘 표시 */}
-        <Box display="flex" justifyContent="center">
-        <IconComponent sx={{ fontSize: 70, color: "text.secondary" }} />
-        </Box>
+    <Stack gap={3} py={4}>
+      {/* 아이콘 표시 */}
+      <Box display="flex" justifyContent="center">
+        <IconComponent sx={{ fontSize: 70, color: "text.primary" }} />
+      </Box>
 
-        {/* 제목 및 필수/선택 라벨 */}
-        <Stack alignItems="center" gap={1}>
-          <Stack direction="row" alignItems="center" gap={1}>
+      {/* 제목 및 필수/선택 라벨 */}
+      <Stack alignItems="center" gap={1}>
+        <Stack direction="row" alignItems="center" gap={1}>
           <Typography variant="h2" fontWeight={700}>
-              {title}
-            </Typography>
-            <Typography 
-              variant="h4" 
-              color={type === "필수" ? "error" : "text.primary"}
-            >
-              {`[${type}]${type === "필수" ? "*" : ""}`}
-            </Typography>
-          </Stack>
-
-          {/* 부제목 */}
-          <Typography variant="body1" color="text.secondary">
-            {subtitle}
+            {title}
+          </Typography>
+          <Typography
+            variant="h4"
+            color={type === "필수" ? "error" : "text.primary"}
+          >
+            {`[${type}]${type === "필수" ? "*" : ""}`}
           </Typography>
         </Stack>
 
+        {/* 부제목 */}
+        <Typography variant="body1" color="text.secondary">
+          {subtitle}
+        </Typography>
+      </Stack>
+
       {/* 폼 필드들 */}
       <Stack gap={4}>
-          {formFields.map((field, index) => (
+        {formFields.map((field, index) => (
           <Stack key={index} gap={1.5}>
             {/* 필드 제목 */}
             <Typography variant="body2" fontWeight={500} fontSize={16}>
-                {field.title}
-              </Typography>
+              {field.title}
+            </Typography>
 
-              {/* 일반 텍스트 입력 필드 */}
-              {field.type === "input" && (
-                <OutlinedInput
-                  placeholder={field.placeholder || "입력해주세요."}
-                  value={formData[field.title] || ""}
+            {/* 일반 텍스트 입력 필드 */}
+            {field.type === "input" && (
+              <OutlinedInput
+                placeholder={field.placeholder || "입력해주세요."}
+                value={formData[field.title] || ""}
                 onChange={(e) => handleInputChange(field.title, e.target.value)}
                 sx={{
                   width: "100%",
@@ -131,18 +131,18 @@ const FormStep = ({
                     e.preventDefault();
                   }
                 }}
-                  sx={{
+                sx={{
                   width: "100%",
-                    borderRadius: 2,
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "divider",
-                    },
-                  }}
-                />
-              )}
+                  borderRadius: 2,
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "divider",
+                  },
+                }}
+              />
+            )}
 
-              {/* 선택 버튼 필드 */}
-              {field.type === "select" && field.options && (
+            {/* 선택 버튼 필드 */}
+            {field.type === "select" && field.options && (
               <Box sx={{ width: "100%" }}>
                 {field.options.length <= 2 ? (
                   <Stack direction="row" gap={1}>
@@ -170,12 +170,12 @@ const FormStep = ({
                             }),
                             // 선택되지 않은 상태
                             ...(!isSelected && {
-                              backgroundColor: "grey.100",
+                              backgroundColor: "background.default",
                               color: "text.primary",
                               border: "1px solid",
-                              borderColor: "grey.300",
+                              borderColor: "divider",
                               "&:hover": {
-                                backgroundColor: "grey.200",
+                                backgroundColor: "background.gray",
                               },
                             }),
                           }}
@@ -188,12 +188,12 @@ const FormStep = ({
                 ) : (
                   <Stack gap={2.5}>
                     <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                      {Array.from({ 
-                        length: Math.ceil(field.options.length / 3) 
+                      {Array.from({
+                        length: Math.ceil(field.options.length / 3)
                       }, (_, rowIndex) => {
                         const rowOptions = field.options?.slice(rowIndex * 3, (rowIndex + 1) * 3) || [];
                         const hasOddItem = rowOptions.length < 3 && rowOptions.length > 0;
-                        
+
                         return (
                           <Stack key={rowIndex} direction="row" gap={1} sx={{ mb: rowIndex < Math.ceil((field.options?.length ?? 0) / 3) - 1 ? 2.5 : 0 }}>
                             {rowOptions.map((option) => {
@@ -218,12 +218,12 @@ const FormStep = ({
                                       },
                                     }),
                                     ...(!isSelected && {
-                                      backgroundColor: "grey.100",
+                                      backgroundColor: "background.default",
                                       color: "text.primary",
                                       border: "1px solid",
-                                      borderColor: "grey.300",
+                                      borderColor: "divider",
                                       "&:hover": {
-                                        backgroundColor: "grey.200",
+                                        backgroundColor: "background.gray",
                                       },
                                     }),
                                   }}
@@ -244,8 +244,8 @@ const FormStep = ({
                     </Box>
 
                     <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-                      {Array.from({ 
-                        length: Math.ceil(field.options.length / 2) 
+                      {Array.from({
+                        length: Math.ceil(field.options.length / 2)
                       }, (_, rowIndex) => {
                         const rowOptions = field.options?.slice(rowIndex * 2, (rowIndex + 1) * 2) || [];
                         const hasOddItem = rowOptions.length === 1;
@@ -259,7 +259,7 @@ const FormStep = ({
                             sx={{
                               mb:
                                 rowIndex <
-                                Math.ceil(field.options.length / 2) - 1
+                                  Math.ceil(field.options.length / 2) - 1
                                   ? 2.5
                                   : 0,
                             }}
@@ -289,14 +289,14 @@ const FormStep = ({
                                       backgroundColor: "grey.100",
                                       color: "text.primary",
                                       border: "1px solid",
-                                      borderColor: "grey.300",
+                                      borderColor: "divider",
                                       "&:hover": {
                                         backgroundColor: "grey.200",
                                       },
                                     }),
                                   }}
                                 >
-                      {option}
+                                  {option}
                                 </Button>
                               );
                             })}
@@ -308,10 +308,10 @@ const FormStep = ({
                   </Stack>
                 )}
               </Box>
-              )}
+            )}
 
-              {/* 커스텀 드롭다운 필드 */}
-              {field.type === "dropdown" && field.options && (
+            {/* 커스텀 드롭다운 필드 */}
+            {field.type === "dropdown" && field.options && (
               <Box sx={{ position: "relative", zIndex: 1000 }}>
                 <CustomDropdown
                   value={formData[field.title] || ""}
@@ -320,11 +320,11 @@ const FormStep = ({
                   placeholder={field.placeholder || "입력하거나 선택해주세요."}
                 />
               </Box>
-              )}
-            </Stack>
-          ))}
-        </Stack>
+            )}
+          </Stack>
+        ))}
       </Stack>
+    </Stack>
   );
 };
 

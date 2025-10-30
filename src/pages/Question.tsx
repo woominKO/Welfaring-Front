@@ -89,7 +89,7 @@ const Question = () => {
           type: "dropdown" as const,
           placeholder: "입력해주세요.",
           options: [
-            "서울",
+            "서울특별시",
             "경기",
             "인천",
             "부산",
@@ -101,7 +101,7 @@ const Question = () => {
           ],
         },
         {
-          title: "가입보험",
+          title: "보험",
           type: "select" as const,
           options: ["의료급여", "건강보험", "지역보험", "직장보험"],
         },
@@ -122,7 +122,7 @@ const Question = () => {
       ],
     },
     {
-      type: "필수" as const,
+      type: "선택" as const,
       title: "추가정보",
       subtitle: "추가 정보를 입력해주세요.",
       icon: Work,
@@ -247,16 +247,18 @@ const Question = () => {
         </Stack>
 
         {/* 현재 단계 폼 */}
-        <FormStep
-          type={currentStep.type}
-          title={currentStep.title}
-          subtitle={currentStep.subtitle}
-          formFields={currentStep.formFields}
-          onFormDataChange={handleFormDataChange}
-          stepKey={step}
-          icon={currentStep.icon}
-          initialValues={allFormData[step] || {}}
-        />
+        <Box sx={{ pb: currentStep.type === "선택" ? 5 : 0 }}>
+          <FormStep
+            type={currentStep.type}
+            title={currentStep.title}
+            subtitle={currentStep.subtitle}
+            formFields={currentStep.formFields}
+            onFormDataChange={handleFormDataChange}
+            stepKey={step}
+            icon={currentStep.icon}
+            initialValues={allFormData[step] || {}}
+          />
+        </Box>
 
         {/* 알림 메시지 영역 */}
         <Box

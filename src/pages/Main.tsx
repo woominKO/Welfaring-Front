@@ -23,7 +23,7 @@ const Main = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: { xs: "center", md: "flex-start" },
-                bgcolor: "white",
+                bgcolor: "background.default",
               }}
             >
               {/* 텍스트 콘텐츠 스택 */}

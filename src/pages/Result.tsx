@@ -68,6 +68,14 @@ const Result = () => {
           rawInputData,
           controller.signal
         );
+        console.groupCollapsed('[Result] fetchMatchingBenefits 결과');
+        console.log('카드 개수:', resultCards?.length ?? 0);
+        try {
+          console.table(
+            (resultCards || []).map((c) => ({ id: c.id, title: c.title, conds: c.conditions?.length }))
+          );
+        } catch {}
+        console.groupEnd();
         setCards(resultCards);
       } catch (err) {
         if ((err as any)?.name !== 'CanceledError') {

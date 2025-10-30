@@ -58,6 +58,7 @@ export const sendDataToAiMatcher = async (inputData: InputData, signal?: AbortSi
     await axios.post(endpoint, payload, {
       headers: { "Content-Type": "application/json" },
       signal: signal, // AbortController 신호 전달
+      timeout: 10000, // 10초 타임아웃
       withCredentials: false,
     });
     console.log("AI 매칭 데이터 전송 성공:", payload);
@@ -65,7 +66,11 @@ export const sendDataToAiMatcher = async (inputData: InputData, signal?: AbortSi
     if (axios.isCancel(error)) {
       console.log("API 요청이 중단되었습니다.", error.message);
     } else {
-      console.error("AI 매칭 데이터 전송 실패:", error);
+      if ((axios as any).isAxiosError?.(error) && (error as any).code === 'ECONNABORTED') {
+        console.error("AI 매칭 데이터 전송 실패: 10초 초과로 타임아웃.");
+      } else {
+        console.error("AI 매칭 데이터 전송 실패:", error);
+      }
       // 사용자에게 오류를 알릴 필요가 있다면 여기서 처리
     }
   }
@@ -105,19 +110,167 @@ export const fetchMatchingBenefits = async (
     description: inputData.추가설명 || undefined,
   };
 
+  // 리퀘스트 바디 콘솔 출력
+  console.log('[AI매칭] API 요청 payload:', payload);
+
   try {
-    const response = await axios.post<BenefitCard[]>(endpoint, payload, {
+    const response = await axios.post<any>(endpoint, payload, {
       headers: { "Content-Type": "application/json" },
       signal,
+      timeout: 10000, // 10초 타임아웃
       withCredentials: false,
     });
-    return response.data ?? [];
+
+    // 수신 응답 로깅 (원본)
+    console.groupCollapsed('[AI매칭] API 응답 수신');
+    console.log('원본 response.data:', response.data);
+    const root = response.data;
+    const matchedBenefitsRaw = Array.isArray(root)
+      ? root
+      : root?.matched_benefits || root?.matchedBenefits || root?.benefits || [];
+    console.log('응답 항목 개수:', matchedBenefitsRaw.length);
+    if (matchedBenefitsRaw.length > 0) {
+      try {
+        console.table(
+          matchedBenefitsRaw.map((b: any, i: number) => ({
+            idx: i,
+            name: b?.benefit_name,
+            provider: b?.provider,
+          }))
+        );
+      } catch {
+        // table이 실패하더라도 흐름에 영향 주지 않음
+      }
+    }
+    console.groupEnd();
+
+    // 백엔드 응답 원본 (array at root 또는 키 하위 모두 지원)
+    const matchedBenefits = Array.isArray(root)
+      ? root
+      : root?.matched_benefits || root?.matchedBenefits || root?.benefits || [];
+
+    // 필터링 없이 모든 응답을 변환합니다.
+
+    const transformedCards: BenefitCard[] = matchedBenefits.map(
+      (benefit: any, index: number) => {
+        const conditions: string[] = [];
+
+        // title/description/provider/application_method: snake_case | camelCase 모두 허용
+        const dataSource = benefit.data_source || benefit.dataSource || {};
+        const sourceName = dataSource.source_name || dataSource.sourceName;
+        const benefitName = sourceName || benefit.benefit_name || benefit.benefitName || benefit.title;
+        const benefitDesc = benefit.benefit_description || benefit.benefitDescription || benefit.description;
+        const applicationMethod = benefit.application_method || benefit.applicationMethod;
+        const provider = benefit.provider || benefit.agency || '';
+
+        // target_criteria → conditions 변환 (snake_case | camelCase 모두 허용)
+        const criteriaRoot = benefit.target_criteria || benefit.targetCriteria || {};
+        if (criteriaRoot?.one_of) {
+          (criteriaRoot.one_of as any[]).forEach((criteria: any) => {
+            const ageVal = criteria.age || criteria.age_min || criteria.ageMax || criteria.ageMin || criteria.age_max;
+            const diseaseVal = criteria.disease || criteria.diseases;
+            if (ageVal != null) conditions.push(`나이: ${ageVal}`);
+            if (diseaseVal) conditions.push(`질환: ${diseaseVal}`);
+          });
+        }
+
+        // 개별 기준들 일반화 처리
+        const ageMin = criteriaRoot.age_min ?? criteriaRoot.ageMin;
+        const ageMax = criteriaRoot.age_max ?? criteriaRoot.ageMax;
+        if (ageMin != null && ageMax != null) conditions.push(`나이: ${ageMin}~${ageMax}`);
+        else if (ageMin != null) conditions.push(`최소 나이: ${ageMin}`);
+        else if (ageMax != null) conditions.push(`최대 나이: ${ageMax}`);
+
+        const genderCrit = criteriaRoot.gender;
+        if (typeof genderCrit === 'string' && genderCrit.trim()) conditions.push(`성별: ${genderCrit}`);
+
+        const regionCrit = criteriaRoot.region || criteriaRoot.regions;
+        if (Array.isArray(regionCrit) && regionCrit.length > 0) conditions.push(`지역: ${regionCrit.join(', ')}`);
+        else if (typeof regionCrit === 'string' && regionCrit.trim()) conditions.push(`지역: ${regionCrit}`);
+
+        const incomeMin = criteriaRoot.income_min ?? criteriaRoot.incomeMin;
+        const incomeMax = criteriaRoot.income_max ?? criteriaRoot.incomeMax;
+        if (incomeMin != null && incomeMax != null) conditions.push(`소득: ${incomeMin}~${incomeMax}`);
+        else if (incomeMin != null) conditions.push(`최소 소득: ${incomeMin}`);
+        else if (incomeMax != null) conditions.push(`최대 소득: ${incomeMax}`);
+
+        if (criteriaRoot?.care_need_assessed || criteriaRoot?.careNeedAssessed) {
+          conditions.push("요양등급 인정 필요");
+        }
+
+        if (criteriaRoot?.hospitalized) {
+          conditions.push("입원 환자");
+        }
+
+        const insuranceTypes: string[] = criteriaRoot?.insurance_type || criteriaRoot?.insuranceType || [];
+        if (Array.isArray(insuranceTypes)) {
+          insuranceTypes.forEach((type: string) => {
+            conditions.push(`가입보험: ${type}`);
+          });
+        }
+
+        const chronic: string[] = criteriaRoot?.chronic_diseases || criteriaRoot?.chronicDiseases || [];
+        if (Array.isArray(chronic) && chronic.length > 0) conditions.push(`만성질환: ${chronic.join(', ')}`);
+
+        if (criteriaRoot?.is_basic_recipient === true) conditions.push('기초수급자');
+        if (criteriaRoot?.is_disabled === true) conditions.push('장애인');
+        if (criteriaRoot?.is_low_income === true) conditions.push('저소득층');
+
+        const card: BenefitCard = {
+          id: `benefit-${index}`,
+          title: benefitName || '제목 없음',
+          conditions: conditions.length > 0 ? conditions : ["조건 정보 없음"],
+          detail: {
+            description: benefitDesc || '',
+            eligibility: conditions,
+            applicationMethod: applicationMethod ? [applicationMethod] : [],
+            requiredDocuments: [],
+            supportAmount: "",
+            contactInfo: provider,
+          },
+        };
+
+        return card;
+      }
+    );
+
+    // 변환 결과 로깅
+    console.groupCollapsed('[AI매칭] 변환된 카드 목록');
+    console.log('카드 개수:', transformedCards.length);
+    if (transformedCards.length > 0) {
+      try {
+        console.table(
+          transformedCards.map((c) => ({ id: c.id, title: c.title, conditions: c.conditions.join(', ') }))
+        );
+      } catch {
+        // table이 실패하더라도 흐름에 영향 주지 않음
+      }
+    }
+    console.groupEnd();
+
+    return transformedCards;
   } catch (error) {
     if (axios.isCancel(error)) {
       // 요청 취소 시 빈 배열 반환
       return [];
     }
-    console.error("매칭 데이터 조회 실패:", error);
+    // 에러 응답 상세 로깅
+    if (axios.isAxiosError?.(error)) {
+      if ((error as any).code === 'ECONNABORTED') {
+        console.error('[AI매칭] 요청 타임아웃: 10초 초과');
+        return [];
+      }
+      console.group('[AI매칭] 매칭 데이터 조회 실패');
+      console.error('메시지:', error.message);
+      if (error.response) {
+        console.error('상태 코드:', error.response.status);
+        console.error('응답 헤더:', error.response.headers);
+        console.error('응답 바디:', error.response.data);
+      }
+      console.groupEnd();
+    } else {
+      console.error('매칭 데이터 조회 실패:', error);
+    }
     throw error;
   }
 };

@@ -32,7 +32,7 @@ export const theme = createTheme({
             light: "#e0e0e0"
           } as any,
           text: { 
-            primary: "#000000",
+            primary: "#404040",
             secondary: "#404040"
           },
         },
@@ -41,10 +41,10 @@ export const theme = createTheme({
         palette: {
           mode: 'dark',
           primary: { 
-            main: "#6FB1DC",
+            main: "#4E6BA9",
             light: "#8BC4E8",
             dark: "#5B88BE",
-            hover: "#4E6BA9"
+            hover: "#6FB1DC"
           },
           secondary: { 
             main: "#ccc",
@@ -64,7 +64,7 @@ export const theme = createTheme({
           divider: "rgba(255, 255, 255, 0.5)",
           text: { 
             primary: "#ffffff",
-            secondary: "#404040"
+            secondary: "#B8B8B8"
           },
         },
       },

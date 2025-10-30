@@ -56,7 +56,7 @@ const InputInfoSection = ({ inputData }: InputInfoSectionProps) => {
             </Typography>
             <Box
                 sx={{
-                    bgcolor: "grey.200",
+                    bgcolor: "background.gray",
                     borderRadius: 1,
                     px: 2,
                     py: 1,
@@ -112,15 +112,15 @@ const InputInfoSection = ({ inputData }: InputInfoSectionProps) => {
     <Stack gap={1.5}>
       {/* ... (JSX 렌더링 부분은 원본과 동일) ... */}
       <Stack direction="row" alignItems="center" gap={1.5}>
-          <Person sx={{ fontSize: 30, color: "text.secondary" }} />
-          <Typography variant="h3" fontWeight={700} color="text.secondary">
+          <Person sx={{ fontSize: 30, color: "primary.text.primary" }} />
+          <Typography variant="h3" fontWeight={700} color="primary.text.primary">
               입력 정보
           </Typography>
       </Stack>
 
       <Box
           sx={{
-              bgcolor: "#ffffff",
+              bgcolor: "primary.background.default",
               borderRadius: 2,
               p: 3,
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
