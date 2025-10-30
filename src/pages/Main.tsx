@@ -9,7 +9,7 @@ const Main = () => {
         {/* 메인 콘텐츠 스택 */}
         <Stack gap={"5vh"}>
           <Box
-            mt={{ xs: 5, md: 0 }}
+            mt={{ xs: 4, md: 0 }}
             minHeight={{ xs: "0", md: "calc(100vh - 500px)" }}
             sx={{
               display: "flex",

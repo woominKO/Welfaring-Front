@@ -1,107 +1,90 @@
+import { useState, useEffect, useMemo } from "react"; // ⬅️ 훅 추가
 import {
   Container,
   Stack,
   Button,
-} from "@mui/material";
+  Box,
+  CircularProgress,
+  Alert,
+  Typography,
+} from "@mui/material"; // ⬅️ 로딩/에러 UI 추가
 import { useNavigate, useLocation } from "react-router-dom";
-import SummaryStep, { BenefitCard, BenefitDetail } from "../components/SummaryStep";
+import SummaryStep, { BenefitCard } from "../components/SummaryStep"; // ⬅️ BenefitDetail 제거 (API 함수로 이동)
 import InputInfoSection, { InputData } from "../components/InputInfoSection";
+import { fetchMatchingBenefits } from "../components/sendDataToAiMatcher"; // ⬅️ 1번에서 만든 API 함수 임포트
 
-const sampleDetail: BenefitDetail = {
-  description:
-    "노인장기요양보험은 만 65세 이상 노인이나 만 65세 미만인 노인성 질병을 가진 사람에게 제공하는 장기요양 급여에 대한 보험제도입니다.",
-  eligibility: [
-    "만 65세 이상인 자",
-    "만 65세 미만이지만 치매, 뇌혈관 질환 등으로 인해 일상생활 수행이 어려운 자",
-    "소득수준이 상위 80% 이하인 자",
-    "장기요양등급을 받은 자 (1~5등급)",
-  ],
-  applicationMethod: [
-    "시·군·구청 또는 읍·면·동 주민센터에 방문하여 신청",
-    "온라인 신청: 복지로(www.bokjiro.go.kr) 또는 정부24(www.gov.kr)",
-    "전화 신청: 국번없이 129 또는 시·군·구청 담당 부서",
-  ],
-  requiredDocuments: [
-    "신청서",
-    "신분증",
-    "주민등록등본(또는 가족관계증명서)",
-    "소득·재산 증명 서류",
-    "의료기관 진단서(해당 시)",
-  ],
-  supportAmount:
-    "등급 및 수급자의 소득수준에 따라 차등 지원됩니다. 월 최대 200만원까지 지원 가능합니다.",
-  contactInfo: "국번없이 129 또는 해당 시·군·구청 사회복지과",
-};
-
-const sampleCards: BenefitCard[] = [
-  {
-    id: "1",
-    title: "노인장기요양보험",
-    conditions: [
-      "최소 65세 이상",
-      "치매, 중풍 등",
-      "전체 소득 상위 80% 이상",
-    ],
-    detail: sampleDetail,
-  },
-  {
-    id: "2",
-    title: "노인장기요양보험",
-    conditions: [
-      "최소 65세 이상",
-      "치매, 중풍 등",
-      "전체 소득 상위 80% 이상",
-    ],
-    detail: sampleDetail,
-  },
-  {
-    id: "3",
-    title: "노인장기요양보험",
-    conditions: [
-      "최소 65세 이상",
-      "치매, 중풍 등",
-      "전체 소득 상위 80% 이상",
-    ],
-    detail: sampleDetail,
-  },
-  {
-    id: "4",
-    title: "노인장기요양보험",
-    conditions: [
-      "최소 65세 이상",
-      "치매, 중풍 등",
-      "전체 소득 상위 80% 이상",
-    ],
-    detail: sampleDetail,
-  },
-  {
-    id: "4",
-    title: "노인장기요양보험",
-    conditions: [
-      "최소 65세 이상",
-      "치매, 중풍 등",
-      "전체 소득 상위 80% 이상",
-    ],
-    detail: sampleDetail,
-  },
-];
+// ❌ sampleDetail, sampleCards 전체 삭제
 
 const Result = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Question.tsx에서 전달된 폼 데이터 가져오기
-  const formData = (location.state as { formData?: Record<string, string> })?.formData || {};
-  
-  // 입력 정보 포맷팅 (나이는 "살" 붙이기, 입력하지 않은 필드는 기본값 표시)
-  const inputData: InputData = {
-    나이: formData["나이"] ? `${formData["나이"]}살` : "-",
-    성별: formData["성별"] || "-",
-    지역: formData["지역"] || "-",
-    장애: formData["장애"] || "없음",
-    질환: formData["질환"] || "없음",
-    보험자격: formData["보험자격"] || "지역 가입자 ㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇ ㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇ ㅇㅁㄴㅇㅁㄴㅇㄴㅁ ㅇㅁㄴㅇㅁㄴㅇㅁㄴ ㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇ ㅇㅁㅇㅁㄴㅇ",
-  };
+  // --- 1. API 상태 관리 ---
+  const [cards, setCards] = useState<BenefitCard[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const formData =
+    (location.state as { formData?: Record<string, string> })?.formData || {};
+
+  // --- 2. API 전송용 '원본' 데이터 (useMemo로 최적화) ---
+  const rawInputData: InputData = useMemo(
+    () => ({
+      나이: formData["나이"] || "",
+      성별: formData["성별"] || "",
+      지역: formData["지역"] || "",
+      장애: formData["장애"] || "",
+      질환: formData["질환"] || "",
+      보험: formData["보험"] || "",
+      추가설명: formData["세부사항(자세히)"] || "",
+    }),
+    [formData]
+  );
+
+  // --- 3. InputInfoSection 표출용 '포맷팅된' 데이터 (useMemo로 최적화) ---
+  const displayInputData: InputData = useMemo(
+    () => ({
+      나이: rawInputData.나이 ? `${rawInputData.나이}살` : "-",
+      성별: rawInputData.성별 || "-",
+      지역: rawInputData.지역 || "-",
+      장애: rawInputData.장애 || "없음",
+      질환: rawInputData.질환 || "없음",
+      보험: rawInputData.보험 || "없음",
+      추가설명: rawInputData.추가설명 || "-",
+    }),
+    [rawInputData]
+  );
+
+  // --- 4. 컴포넌트 마운트 시 API 호출 ---
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // '원본' rawInputData로 API 호출
+        const resultCards = await fetchMatchingBenefits(
+          rawInputData,
+          controller.signal
+        );
+        setCards(resultCards);
+      } catch (err) {
+        if ((err as any)?.name !== 'CanceledError') {
+          setError("데이터를 불러오는 데 실패했습니다. 다시 시도해 주세요.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+
+    // 컴포넌트 언마운트 시 API 요청 중단
+    return () => {
+      controller.abort();
+    };
+  }, [rawInputData]); // '원본' 데이터가 변경될 때만 실행
 
   const handleSearchAgain = () => {
     navigate("/question");
@@ -110,15 +93,33 @@ const Result = () => {
   return (
     <Container maxWidth="md">
       <Stack gap={5} py={4}>
-        {/* 입력 정보 섹션 */}
-        <InputInfoSection inputData={inputData} />
+        {/* 입력 정보 섹션 (표시용 데이터 사용) */}
+        <InputInfoSection inputData={displayInputData} />
 
-        {/* AI 맞춤 요약 섹션 */}
-        <SummaryStep
-          title="AI 맞춤 요약"
-          count={sampleCards.length}
-          cards={sampleCards}
-        />
+        {/* --- 5. AI 맞춤 요약 섹션 (조건부 렌더링) --- */}
+        {isLoading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              py: 10,
+            }}
+          >
+            <CircularProgress />
+            <Typography variant="body1" sx={{ ml: 2 }}>
+              AI가 맞춤형 정보를 찾고 있습니다...
+            </Typography>
+          </Box>
+        ) : error ? (
+          <Alert severity="error">{error}</Alert>
+        ) : (
+          <SummaryStep
+            title="AI 맞춤 요약"
+            count={cards.length} // ⬅️ 실제 데이터 개수
+            cards={cards}         // ⬅️ 실제 데이터
+          />
+        )}
 
         {/* 다시 검색하기 버튼 */}
         <Button
@@ -140,4 +141,3 @@ const Result = () => {
 };
 
 export default Result;
-

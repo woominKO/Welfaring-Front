@@ -82,7 +82,7 @@ const Question = () => {
         {
           title: "성별",
           type: "select" as const,
-          options: ["남성", "여성","중성","기타","1","2","3","4","5","6","7","8","9"],
+          options: ["남성", "여성"],
         },
         {
           title: "지역",
@@ -100,18 +100,53 @@ const Question = () => {
             "가나다라마바사",
           ],
         },
+        {
+          title: "가입보험",
+          type: "select" as const,
+          options: ["의료급여", "건강보험", "지역보험", "직장보험"],
+        },
+
       ],
     },
     {
       type: "선택" as const,
       title: "추가정보",
+      subtitle: "자세한 정보를 입력해주세요.",
+      icon: Work,
+      formFields: [
+        {
+          title: "세부사항(자세히)",
+          type: "input" as const,
+          placeholder: "입력해주세요.",
+        },
+      ],
+    },
+    {
+      type: "필수" as const,
+      title: "추가정보",
       subtitle: "추가 정보를 입력해주세요.",
       icon: Work,
       formFields: [
         {
-          title: "직업",
-          type: "input" as const,
+          title: "질환",
+          type: "dropdown" as const,
           placeholder: "입력해주세요.",
+          options: [
+            "서울",
+            "경기",
+            "인천",
+            "부산",
+            "대구",
+            "광주",
+            "대전",
+            "울산",
+            "가나다라마바사",
+          ],
+        },
+        {
+          title: "장애",
+          type: "select" as const,
+          options: ["유", "무"],
         },
       ],
     },
@@ -195,7 +230,7 @@ const Question = () => {
   const currentStep = steps[step];
 
   return (
-    <Container maxWidth="md" sx={{ pb: 10, pt:4}}>
+    <Container maxWidth="md" sx={{ pb: 10, pt: 4 }}>
       <Stack gap={3}>
         {/* 상단 네비게이션 바 */}
         <Stack
@@ -313,33 +348,33 @@ const Question = () => {
           제출 확인
         </DialogTitle>
         <Stack py={2}>
-        <DialogContent id="confirm-dialog-description" sx={{ textAlign: "center", py: 2 }}>
-          <Typography variant="body1" color="text.secondary">
-            입력하신 정보를 제출하시겠습니까?
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: "center", gap: 2, pb: 3 }}>
-          <Button
-            variant="outlined"
-            onClick={handleCancelSubmit}
-            sx={{
-              minWidth: 100,
-              borderRadius: 2,
-            }}
-          >
-            아니요
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleConfirmSubmit}
-            autoFocus
-            sx={{
-              minWidth: 100,
-              borderRadius: 2,
-            }}
-          >
-            예
-          </Button>
+          <DialogContent id="confirm-dialog-description" sx={{ textAlign: "center", py: 2 }}>
+            <Typography variant="body1" color="text.secondary">
+              입력하신 정보를 제출하시겠습니까?
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ justifyContent: "center", gap: 2, pb: 3 }}>
+            <Button
+              variant="outlined"
+              onClick={handleCancelSubmit}
+              sx={{
+                minWidth: 100,
+                borderRadius: 2,
+              }}
+            >
+              아니요
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleConfirmSubmit}
+              autoFocus
+              sx={{
+                minWidth: 100,
+                borderRadius: 2,
+              }}
+            >
+              예
+            </Button>
           </DialogActions>
         </Stack>
       </Dialog>

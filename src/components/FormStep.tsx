@@ -75,7 +75,7 @@ const FormStep = ({
               variant="h4" 
               color={type === "필수" ? "error" : "text.primary"}
             >
-              [{type}]*
+              {`[${type}]${type === "필수" ? "*" : ""}`}
             </Typography>
           </Stack>
 

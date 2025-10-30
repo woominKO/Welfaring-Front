@@ -159,13 +159,16 @@ const CustomDropdown = ({
       {isOpen && (
         <Paper
           sx={{
-            position: "relative",
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            right: 0,
             mt: 1,
             maxHeight: "144px",
             overflow: "auto",
             boxShadow: 2,
             borderRadius: 2,
-            zIndex: 1000,
+            zIndex: 1300,
           }}
         >
           <List dense={false}>
